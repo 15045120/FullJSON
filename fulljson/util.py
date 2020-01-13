@@ -1,11 +1,11 @@
 # -*- coding: UTF-8 -*-
 from .errors import JSONDecoderError
 
-JSON_DELIMITER = ['{', '[', '"', ']', '}', ':', ","]
+JSON_DELIMITER = ['{', '[', '"', ']', '}', ':', ',']
 
 CLASS_OBJECT = type({})
 CLASS_ARRAY = type([])
-CLASS_STRING = type("")
+CLASS_STRING = type('')
 CLASS_FLOAT = type(1.0)
 CLASS_INT = type(1)
 CLASS_BOOL = type(True)

@@ -1,15 +1,7 @@
 # -*- coding: UTF-8 -*-
 from .collections import Stack
-from .util import JSONStrUtil, KeyValue, TypeValue, CLASS_ARRAY,CLASS_OBJECT, PRIMARY_CLASS4JSON
+from .util import JSONStrUtil, KeyValue, TypeValue, CLASS_ARRAY, CLASS_OBJECT, CLASS_STRING, CLASS_BOOL, CLASS_NULL, PRIMARY_CLASS4JSON
 from .errors import JSONEncoderError
-
-CLASS_OBJECT = type({})
-CLASS_ARRAY = type([])
-CLASS_STRING = type("")
-CLASS_FLOAT = type(1.0)
-CLASS_INT = type(1)
-CLASS_BOOL = type(True)
-CLASS_NULL = type(None)
 
 class FullJSONEncoder(object):
     def __init__(self, obj):

@@ -12,8 +12,6 @@ class FullJSONDecoder(object):
         class_stack = Stack()
         keyvalue_stack = Stack()
         
-        has_double_quote = False
-        
         for i,ch in enumerate(self.value):
             if ch == '{':
                 stack.push(ch)
