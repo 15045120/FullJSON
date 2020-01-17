@@ -45,6 +45,9 @@ class Stack(object):
             __values_str = str(self.__values)
             print('<{}>'.format(__values_str[1:len(__values_str)-1]))
 
+    def size(self):
+        return len(self.__values)
+
 class QueueEmptyError(Exception):
     def __init__(self, message):
         self.message = message
@@ -82,3 +85,6 @@ class Queue(object):
         else:
             __values_str = str(self.__values)
             print('<{}>'.format(__values_str[1:len(__values_str)-1]))
+
+    def size(self):
+        return len(self.__values)

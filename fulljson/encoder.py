@@ -49,4 +49,15 @@ class FullJSONEncoder(object):
             res = res + '}'
             return res
         else:
-            return str(target)
+            res = '{'
+            # get class member
+            members = vars(target)
+            if len(members) < 2:
+                for name, value in members.items():
+                    res = res + '"{}":{}'.format(name, self.__do_encode(value))
+            else:
+                for name, value in members.items():
+                    res = res + '"{}":{},'.format(name, self.__do_encode(value))
+                res = res[0:len(res)-1]
+            res = res + '}'
+            return res

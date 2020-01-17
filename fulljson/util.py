@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-from .errors import JSONDecoderError
 
 JSON_DELIMITER = ['{', '[', '"', ']', '}', ':', ',']
 
@@ -13,6 +12,32 @@ CLASS_NULL = type(None)
 
 PRIMARY_CLASS4JSON = [CLASS_STRING, CLASS_FLOAT, CLASS_INT, CLASS_BOOL, CLASS_NULL]
 COLLECTION_CLASS4JSON = [CLASS_OBJECT, CLASS_ARRAY]
+
+class JSONIllegalChar():
+    def __init__(self, msg=None):
+        self.msg = msg
+
+    def __repr__(self):
+        if self.msg == None:
+            return 'Ukown json character'
+        else:
+            return self.msg
+
+    def __str__(self):
+        if self.msg == None:
+            return 'Ukown json character'
+        else:
+            return self.msg
+
+class JSONEmptyChar():
+    def __init__(self):
+        pass
+
+    def __repr__(self):
+        return 'Empty json character'
+
+    def __str__(self):
+        return 'Empty json character'
 
 class JSONStrUtil:
     @staticmethod
@@ -87,30 +112,37 @@ class JSONStrUtil:
 
     @staticmethod
     def isStr(str):
+        # "ad"b" is not a string
         str = str.strip()
         if str == '' or len(str) < 2:
             return False
-        return str[0] == '"' and str[-1] == '"'
+        if str[0] != '"' or str[-1] != '"':
+            return False
+        str = str[1:len(str)-1]
+        if str.find('"') != -1:
+            return False
+        else:
+            return True
 
     @staticmethod
     def valueOf(str):
         str = str.strip()
+        obj = JSONEmptyChar()
         if str == '':
-            return ''
-        primary = ''
+            return obj
         if JSONStrUtil.isNull(str):
-            primary = None
+            obj = None
         elif JSONStrUtil.isFloat(str):
-            primary = float(str)
+            obj = float(str)
         elif JSONStrUtil.isInt(str):
-            primary = int(str)
+            obj = int(str)
         elif JSONStrUtil.isBool(str):
-            primary = bool(str)
+            obj = bool(str)
         elif JSONStrUtil.isStr(str):
-            primary = str[1:len(str)-1]
+            obj = str[1:len(str)-1]
         else:
-            raise JSONDecoderError('Bad string: %s' % str)
-        return primary
+            obj = JSONIllegalChar()
+        return obj
 
 class KeyValue:
     def __init__(self, key, value, border=False):
