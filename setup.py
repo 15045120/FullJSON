@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fulljson",
-    version="0.0.5",
+    version="0.0.52",
     author="15045120",
     author_email="1337078409@qq.com",
     description="simple json conversion implements using stack structure and recursive method",

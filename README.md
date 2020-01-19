@@ -37,7 +37,7 @@ Scan each character in the string, do the following:
 `JSON.stringify(value)` is using recursive method.
 1. If it is a basic type in Python (number, string, bool, None), return the corresponding string (1/1.0, "example", true/false, null)
 2. If it is list and dict, repeat step 1 for each element in the list and dict
-3. Others, return directly by `str` method
+3. Others, It is a class, consider as a dict type, terating over member variables of a class, do the same action as step 1
 ## Installation
 ```bash
 pip install fulljson 
@@ -47,17 +47,47 @@ pip install fulljson
 
  - Convert a JSON string into a JSON object.
 
-```python
-from fulljson import JSON
-
-value = '["foo", {"bar": ["baz", null, 1.0, 2, true]}]'
-print(JSON.parse(value))
+```bash
+>>> from fulljson import JSON
+>>>
+>>> value = '["foo", {"bar": ["baz", null, 1.0, 2, true]}]'
+>>> print(JSON.parse(value))
+['foo', {'bar': ['baz', None, 1.0, 2, True]}]
+>>>
 ```
 
- - Convert JSON values to JSON strings.
-```python
-from fulljson import JSON
 
-value = ["foo", {"bar": ["baz", None, 1.0, 2, True]}]
-print(JSON.stringify(value))
+ - Convert JSON values to JSON strings.
+
+```bash
+>>> from fulljson import JSON
+>>>
+>>> value = ["foo", {"bar": ["baz", None, 1.0, 2, True]}]
+>>> print(JSON.stringify(value))
+["foo",{"bar":["baz",null,1.0,2,true]}]
+>>>
+```
+
+- Format JSON object or JSON strings
+
+```bash
+>>> from fulljson import JSON
+>>>
+>>> value = [{'foo': 'new 0', 'index': None}, "sat", {'bar': 'new 2', 'index': [1, True]}]
+>>> print(JSON.format(value))
+[
+    {
+        "foo":"new 0",
+        "index":null
+    },
+    "sat",
+    {
+        "bar":"new 2",
+        "index":[
+            1,
+            true
+        ]
+    }
+]
+>>>
 ```

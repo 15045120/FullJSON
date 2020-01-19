@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
-class Error(Exception):
+class JSONError(Exception):
     pass
 
-class JSONEncoderError(Error):
+class JSONEncoderError(JSONError):
     def __init__(self, message='cannot stringify JSON object'):
         self.message = message
 
@@ -12,7 +12,7 @@ class JSONEncoderError(Error):
     def __repr__(self):
         return repr(self.message)
 
-class JSONDecoderError(Error):
+class JSONDecoderError(JSONError):
     def __init__(self, message='cannot parse JSON string'):
         self.message = message
 

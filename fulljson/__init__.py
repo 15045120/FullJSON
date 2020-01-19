@@ -1,5 +1,7 @@
 from .decoder import FullJSONDecoder
 from .encoder import FullJSONEncoder
+from .errors import JSONError
+from .util import JSONStrUtil, PRIMARY_CLASS4JSON, COLLECTION_CLASS4JSON, CLASS_STRING
 
 '''
 https://www.json.org/json-en.html
@@ -25,7 +27,7 @@ In JSON, they take on these forms:
 '''
 
 
-__all__=['JSON']
+__all__=['JSON', 'JSONError']
 
 class JSON(object):
     @staticmethod
@@ -37,3 +39,18 @@ class JSON(object):
     def stringify(obj):
         encoder = FullJSONEncoder(obj)
         return encoder.encode()
+
+    @staticmethod
+    def format(value):
+        if type(value) in PRIMARY_CLASS4JSON:
+            if type(value) == CLASS_STRING:
+                decoder = FullJSONDecoder(value)
+                obj = decoder.decode()
+                
+                encoder = FullJSONEncoder(obj)
+                return encoder.encode(format=True)
+            else:
+                return value
+        else:
+            encoder = FullJSONEncoder(value)
+            return encoder.encode(format=True)

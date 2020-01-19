@@ -3,6 +3,9 @@ from .collections import Stack
 from .util import JSONStrUtil, KeyValue, TypeValue, CLASS_ARRAY, CLASS_OBJECT, JSONIllegalChar, JSONEmptyChar
 from .errors import JSONDecoderError
 
+EMPTY_CHARS = [' ', '\t', '\r', '\n']
+ENABLED_FRONT = ['[', ',', ':']
+
 class FullJSONDecoder(object):
     def __init__(self, value):
         self.value = value
@@ -14,11 +17,9 @@ class FullJSONDecoder(object):
         
         i = 0
         while i < len(self.value):
-        #for i in range(len(self.value)):
             ch = self.value[i]
             if ch == '"':
                 stack.push(ch)
-                start = i
                 end = i+1
                 while end < len(self.value) and self.value[end] != '"':
                     ch = self.value[end]
@@ -31,28 +32,25 @@ class FullJSONDecoder(object):
                     stack.push('"')
                     i = end
             elif ch == '{':
-                # no "," delimiter
-                if i > 0:
-                    font_ch = self.value[i-1]
-                    if font_ch != '{' and font_ch != '[' and font_ch != ',':
-                        error_msg = 'Expecting "," delimiter: column {}'.format(i)
-                        raise JSONDecoderError(error_msg)
+                # remove character in [' ', '\t', '\r', '\n']
+                while not stack.is_empty()  and stack.top in EMPTY_CHARS:
+                    stack.pop()
                 # normal status
                 stack.push(ch)
                 class_stack.push(TypeValue(CLASS_OBJECT,{}))
                 # push border object to stack
                 keyvalue_stack.push(KeyValue('', '', border=True))
             elif ch == '[':
-                # no "," delimiter
-                if i > 0:
-                    font_ch = self.value[i-1]
-                    if font_ch != '{' and font_ch != '[' and font_ch != ',':
-                        error_msg = 'Expecting "," delimiter: column {}'.format(i)
-                        raise JSONDecoderError(error_msg)
+                # remove character in [' ', '\n', '\t']
+                while not stack.is_empty() and stack.top in EMPTY_CHARS:
+                    stack.pop()
                 # normal status
                 stack.push(ch)
                 class_stack.push(TypeValue(CLASS_ARRAY,[]))
             elif ch == ',':
+                # remove character in [' ', '\n', '\t']
+                while not stack.is_empty() and stack.top in EMPTY_CHARS:
+                    stack.pop()
                 if class_stack.top.type == CLASS_ARRAY:
                     primary_str = ''.join(stack.pop_all(end='['))
                     primary = JSONStrUtil.valueOf(primary_str)
@@ -101,12 +99,7 @@ class FullJSONDecoder(object):
                     # add the primary value left
                     if type(primary) == JSONEmptyChar:
                         # not found last element in array
-                        font_ch = self.value[i - len(primary_str) - 1]
-                        if font_ch != ',':
-                            pass
-                        else:
-                            error_msg = 'Missing element after "," delimiter: column {}'.format(i)
-                            raise JSONDecoderError(error_msg)
+                        pass
                     elif type(primary) != JSONIllegalChar:
                         class_stack.top.value.append(primary)
                     else:
@@ -136,17 +129,7 @@ class FullJSONDecoder(object):
                     primary = JSONStrUtil.valueOf(primary_str)
                     # add the primary value left
                     if type(primary) == JSONEmptyChar:
-                        font_ch = self.value[i - len(primary_str) - 1]
-                        # not found last element in object
-                        if font_ch != ',':
-                            error_msg = 'Missing element after "," delimiter: column {}'.format(i)
-                            raise JSONDecoderError(error_msg)
-                        # key/value pair is not complete
-                        elif font_ch != ':':
-                            error_msg = 'Missing value in key/value pair: column {}'.format(i)
-                            raise JSONDecoderError(error_msg)
-                        else:
-                            pass
+                        pass
                     elif type(primary) != JSONIllegalChar:
                         keyvalue_stack.top.value = primary
                     else:
@@ -183,4 +166,16 @@ class FullJSONDecoder(object):
             else:
                 stack.push(ch)
             i = i + 1
-        return class_stack.top.value
+        # is array or object
+        if type(class_stack.top) == TypeValue:
+            return class_stack.top.value
+        # is primary json type
+        else:
+            primary_str = ''.join(stack.pop_all())
+            primary = JSONStrUtil.valueOf(primary_str)
+            if type(primary) != JSONIllegalChar:
+                class_stack.push(primary)
+            else:
+                error_msg = 'Illeagal json character sequence {}: in {}'.format(primary_str, primary_str)
+                raise JSONDecoderError(error_msg)
+            return class_stack.top
